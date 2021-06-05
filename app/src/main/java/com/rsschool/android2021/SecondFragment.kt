@@ -6,12 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import java.util.*
+import kotlin.random.Random.Default.nextInt
 
 class SecondFragment : Fragment() {
 
     private var backButton: Button? = null
     private var result: TextView? = null
+
+    private var listener: ActivityFromMain? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,28 +34,30 @@ class SecondFragment : Fragment() {
         val min = arguments?.getInt(MIN_VALUE_KEY) ?: 0
         val max = arguments?.getInt(MAX_VALUE_KEY) ?: 0
 
-        result?.text = generate(min, max).toString()
+        val answer = generate(min, max)
+        result?.text = answer.toString()
+
+        listener = context as ActivityFromMain
 
         backButton?.setOnClickListener {
-            // TODO: implement back
+            listener?.openFirstFragment(answer)
         }
     }
 
     private fun generate(min: Int, max: Int): Int {
-        // TODO: generate random number
-        return 0
+        if(min == max) return min
+        return  (min until (max + 1)).random()
     }
 
     companion object {
 
-        @JvmStatic
         fun newInstance(min: Int, max: Int): SecondFragment {
-            val fragment = SecondFragment()
-            val args = Bundle()
-
-            // TODO: implement adding arguments
-
-            return fragment
+            return SecondFragment().apply {
+                arguments = bundleOf(
+                    MIN_VALUE_KEY to min,
+                    MAX_VALUE_KEY to max
+                )
+            }
         }
 
         private const val MIN_VALUE_KEY = "MIN_VALUE"
